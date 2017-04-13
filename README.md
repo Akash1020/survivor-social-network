@@ -2,7 +2,7 @@
 A Java REST API sample using Spring Boot, Spring Data, MongoDB, Maven. Implementing the 
 problem described in https://gist.github.com/akitaonrails/711b5553533d1a14364907bbcdbee677
 
-## Technologies and tools used
+## Frameworks and tools used
 
 For this project I decided to use Spring Boot because it makes taking your project from the ground up
 a lot faster. And time was an important thing I took into consideration due to the short amount of time
