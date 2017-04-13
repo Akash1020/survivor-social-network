@@ -9,7 +9,8 @@ a lot faster. And time was an important thing I took into consideration due to t
 I had to focus on this project. Also used Spring Data MongoDB to handle most of the repository work.
 
 MongoDB was selected because it is light, and runs easy with [syncleous](https://github.com/Syncleus/maven-mongodb-plugin) 
-maven plugin.
+maven plugin. To run this tool one may simply run _mongodb-embedded.bat_. That starts running the mongo db service on 
+localhost in port 37037.
 
 ## End-Points Description
 
