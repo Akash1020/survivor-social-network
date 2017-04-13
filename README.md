@@ -10,7 +10,7 @@ I had to focus on this project. Also used Spring Data MongoDB to handle most of 
 
 MongoDB was selected because it is light, and runs easy with [syncleous](https://github.com/Syncleus/maven-mongodb-plugin) 
 maven plugin. To run this tool one may simply run _mongodb-embedded.bat_. That starts running the mongo db service on 
-localhost in port 37037.
+localhost in port 37037. If you decide to give a look on the data persisted you can find some tools like [Robo Mongo](https://robomongo.org/) to help you with that.
 
 ## End-Points Description
 
