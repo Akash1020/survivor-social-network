@@ -40,7 +40,7 @@ public class ZombieApocalipseApiApplicationTests {
 	@Before
 	public void before() {
 		this.mockMvc = webAppContextSetup(this.wac).apply(
-				documentationConfiguration(this.restDocumentation).uris().withHost("org.zombie.apocalise.api").withPort(80))
+				documentationConfiguration(this.restDocumentation).uris().withHost("survivalnetwork.org").withPort(80))
 				.build();
 	}
 	

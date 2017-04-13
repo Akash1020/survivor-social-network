@@ -1,5 +1,9 @@
 package org.zombie.apocalipse.api.reports;
 
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -23,6 +27,9 @@ public class SurvivorReportsControllerITCase extends ZombieApocalipseApiApplicat
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.data.percentage").value(9.0))
+				.andDo(document("reports/perc-infected",
+						preprocessRequest(prettyPrint()),
+						preprocessResponse(prettyPrint())))
 				.andDo(print());
 	}
 	
@@ -34,6 +41,9 @@ public class SurvivorReportsControllerITCase extends ZombieApocalipseApiApplicat
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.data.percentage").value(91.0))
+				.andDo(document("reports/perc-non-infected",
+						preprocessRequest(prettyPrint()),
+						preprocessResponse(prettyPrint())))
 				.andDo(print());
 	}
 	
@@ -48,6 +58,9 @@ public class SurvivorReportsControllerITCase extends ZombieApocalipseApiApplicat
 				.andExpect(jsonPath("$.data.ammunitionPerSurvivor").value(4.0989010989010985))
 				.andExpect(jsonPath("$.data.foodPerSurvivor").value(4.516483516483516))
 				.andExpect(jsonPath("$.data.medicationPerSurvivor").value(4.824175824175824))
+				.andDo(document("reports/avg-amount-resources",
+						preprocessRequest(prettyPrint()),
+						preprocessResponse(prettyPrint())))
 				.andDo(print());
 	}
 	
@@ -59,6 +72,9 @@ public class SurvivorReportsControllerITCase extends ZombieApocalipseApiApplicat
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.data.pointsLost").value(361))
+				.andDo(document("reports/points-lost",
+						preprocessRequest(prettyPrint()),
+						preprocessResponse(prettyPrint())))
 				.andDo(print());
 	}
 	

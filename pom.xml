@@ -14,13 +14,13 @@
 	<packaging>jar</packaging>
 
 	<name>org-zombie-apocalipse-api</name>
-	<url>Apoc Social Network</url>
+	<url>keepyourbrain.org</url>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<snippetsDirectory>${project.build.directory}/generated-snippets</snippetsDirectory>
 		<java.version>1.8</java.version>
-		<noov.version>1.0-SNAPSHOT</noov.version>
+		<apoc.version>1.0-SNAPSHOT</apoc.version>
 		<corp.version>16.3.0</corp.version>
 		<skip.unit.tests>false</skip.unit.tests>
 		<skip.integration.tests>false</skip.integration.tests>

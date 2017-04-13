@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: org.zombie.apocalipse.api.survivor.SurvivorControllerITCase
--------------------------------------------------------------------------------
-Tests run: 20, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.043 sec - in org.zombie.apocalipse.api.survivor.SurvivorControllerITCase

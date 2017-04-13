@@ -1,5 +1,9 @@
 package org.zombie.apocalipse.api.survivor;
 
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -28,6 +32,9 @@ public class SurvivorControllerITCase extends ZombieApocalipseApiApplicationTest
 		super.perform(requestBuilder)
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
+				.andDo(document("survivors/get-survivors",
+						preprocessRequest(prettyPrint()),
+						preprocessResponse(prettyPrint())))
 				.andDo(print());
 	}
 	
@@ -45,6 +52,9 @@ public class SurvivorControllerITCase extends ZombieApocalipseApiApplicationTest
 				.andExpect(jsonPath("$.data.inventory.food").value(8))
 				.andExpect(jsonPath("$.data.inventory.medication").value(9))
 				.andExpect(jsonPath("$.data.inventory.ammunition").value(2))
+				.andDo(document("survivors/get-survivor",
+						preprocessRequest(prettyPrint()),
+						preprocessResponse(prettyPrint())))
 				.andDo(print());
 	}
 
@@ -72,6 +82,9 @@ public class SurvivorControllerITCase extends ZombieApocalipseApiApplicationTest
 				.andExpect(jsonPath("$.data.name").value("Jane Doe"))
 				.andExpect(jsonPath("$.data.inventory.ammunition").value(10))
 				.andExpect(jsonPath("$.data.inventory.food").value(5))
+				.andDo(document("survivors/create-survivor",
+						preprocessRequest(prettyPrint()),
+						preprocessResponse(prettyPrint())))
 				.andDo(print());
 	}
 	
@@ -88,6 +101,9 @@ public class SurvivorControllerITCase extends ZombieApocalipseApiApplicationTest
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$..message").value("Survivor updated."))
+				.andDo(document("survivors/update-survivor",
+						preprocessRequest(prettyPrint()),
+						preprocessResponse(prettyPrint())))
 				.andDo(print());
 	}
 
@@ -100,6 +116,9 @@ public class SurvivorControllerITCase extends ZombieApocalipseApiApplicationTest
 		super.perform(requestBuilder)
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
+				.andDo(document("survivors/flag-infected-survivor",
+						preprocessRequest(prettyPrint()),
+						preprocessResponse(prettyPrint())))
 				.andDo(print());
 	}
 	
@@ -339,6 +358,9 @@ public class SurvivorControllerITCase extends ZombieApocalipseApiApplicationTest
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$..message").value("Trade succesful."))
+				.andDo(document("survivors/trade",
+						preprocessRequest(prettyPrint()),
+						preprocessResponse(prettyPrint())))
 				.andDo(print());
 	}
 	
