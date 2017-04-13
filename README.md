@@ -27,7 +27,7 @@ The base URL to all end-points is:
 The following end-points for survivor make use of the same fields here listed:
 
 ```
-name : string
+name : string 
 age : int
 gender : string
 lastLocation : double[longitude, latitude]
@@ -135,6 +135,8 @@ Content-Length: 360
 ```
 
 * Creates a new Survivor
+
+OBS: None of the fields can be null.
 
 ```
 POST /survivors
@@ -287,6 +289,8 @@ sellerTrade : {
 ```
 
 * Perform a trade between two survivors
+
+OBS: None of the fields can be null.
 
 ```
 POST /survivors/{id}/trade
