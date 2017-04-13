@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>CustomMatchOperation.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">org-zombie-apocalipse-api</a> &gt; <a href="index.source.html" class="el_package">org.zombie.apocalipse.api.core.mongo</a> &gt; <span class="el_source">CustomMatchOperation.java</span></div><h1>CustomMatchOperation.java</h1><pre class="source lang-java linenums">package org.zombie.apocalipse.api.core.mongo;
+
+import org.springframework.data.mongodb.core.aggregation.AggregationOperationContext;
+import org.springframework.data.mongodb.core.aggregation.MatchOperation;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.CriteriaDefinition;
+import org.springframework.util.Assert;
+
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
+
+/**
+ * generates a custom match with an array of criterias
+ * 
+ * @author itair.miguel
+ *
+ */
+public class CustomMatchOperation extends MatchOperation {
+
+	public CustomMatchOperation(CriteriaDefinition criteriaDefinition) {
+<span class="nc" id="L21">		super(criteriaDefinition);</span>
+<span class="nc" id="L22">	}</span>
+
+	private Criteria[] criterias;
+
+	/**
+	 * Builder for custom match operation
+	 * 
+	 * @return new MatchOperation
+	 */
+	public static CustomMatchOperation set() {
+<span class="nc" id="L32">		return new CustomMatchOperation(null);</span>
+	}
+
+	/**
+	 * returns the object with a list of criterias
+	 * 
+	 * @param criterias
+	 *            - criterias to create the DBObject
+	 * @return CustomMatchOperation this implemented class
+	 */
+	public CustomMatchOperation match(Criteria... criterias) {
+<span class="nc" id="L43">		Assert.notNull(criterias, &quot;var args may not be empty.&quot;);</span>
+<span class="nc" id="L44">		this.criterias = criterias;</span>
+<span class="nc" id="L45">		return this;</span>
+	}
+
+	@Override
+	public DBObject toDBObject(AggregationOperationContext context) {
+<span class="nc" id="L50">		DBObject dbo = new BasicDBObject();</span>
+<span class="nc bnc" id="L51" title="All 2 branches missed.">		for (CriteriaDefinition definition : criterias) {</span>
+<span class="nc" id="L52">			dbo.putAll(definition.getCriteriaObject());</span>
+		}
+<span class="nc" id="L54">		return new BasicDBObject(&quot;$match&quot;, dbo);</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.0.201403182114</span></div></body></html>

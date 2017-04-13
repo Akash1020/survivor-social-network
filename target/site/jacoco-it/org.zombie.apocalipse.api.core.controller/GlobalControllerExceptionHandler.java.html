@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>GlobalControllerExceptionHandler.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">org-zombie-apocalipse-api</a> &gt; <a href="index.source.html" class="el_package">org.zombie.apocalipse.api.core.controller</a> &gt; <span class="el_source">GlobalControllerExceptionHandler.java</span></div><h1>GlobalControllerExceptionHandler.java</h1><pre class="source lang-java linenums">package org.zombie.apocalipse.api.core.controller;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.zombie.apocalipse.api.core.EnvelopeResponse;
+import org.zombie.apocalipse.api.core.EnvelopeResponse.Meta;
+import org.zombie.apocalipse.api.core.exception.InvalidParamsException;
+import org.zombie.apocalipse.api.core.exception.NotFoundException;
+import org.zombie.apocalipse.api.core.exception.ServiceException;
+
+/***
+ * controller that handles the exceptions returned
+ * @author Itair Miguel
+ *
+ */
+@ControllerAdvice
+public class GlobalControllerExceptionHandler {
+	
+<span class="fc" id="L34">	private static final Logger LOGGER = LogManager.getLogger(GlobalControllerExceptionHandler.class);</span>
+
+	private Map&lt;Class&lt;? extends ServiceException&gt;, HttpStatus&gt; statusMap;
+	
+	/**
+	 * controller with the HTTP Status for the exception
+	 */
+<span class="fc" id="L41">	public GlobalControllerExceptionHandler() {</span>
+<span class="fc" id="L42">		statusMap = new HashMap&lt;Class&lt;? extends ServiceException&gt;, HttpStatus&gt;();</span>
+<span class="fc" id="L43">		statusMap.put(ServiceException.class, HttpStatus.INTERNAL_SERVER_ERROR);</span>
+<span class="fc" id="L44">		statusMap.put(NotFoundException.class, HttpStatus.NOT_FOUND);</span>
+<span class="fc" id="L45">		statusMap.put(InvalidParamsException.class, HttpStatus.BAD_REQUEST);</span>
+<span class="fc" id="L46">	}</span>
+	
+	/**
+	 * handles unexpected exceptions
+	 * @param exception {@link Exception} the exception
+	 * @param request {@link HttpServletRequest} the request
+	 * @return {@link EnvelopeResponse} an envelope with the error response
+	 */
+	@ExceptionHandler(Exception.class)
+	@ResponseBody
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	public EnvelopeResponse exceptionHandler(Exception exception, HttpServletRequest request) {
+<span class="nc" id="L58">		LOGGER.error(&quot;Wow, that was unexpected. Sorry for that.&quot;, exception);</span>
+<span class="nc" id="L59">		Meta meta = new EnvelopeResponse.Meta();</span>
+<span class="nc" id="L60">		meta.addError(exception.getClass().getSimpleName(), exception.getMessage());</span>
+<span class="nc" id="L61">		return new EnvelopeResponse(meta);</span>
+	}
+	
+	/**
+	 * handles expected exceptions ({@link ServiceException}
+	 * @param exception {@link ServiceException} the exception
+	 * @param request {@link HttpServletRequest} the request
+	 * @return {@link EnvelopeResponse} an envelope with the error response
+	 */
+	@ExceptionHandler(ServiceException.class)
+	@ResponseBody
+	public ResponseEntity&lt;EnvelopeResponse&gt; exceptionHandler(ServiceException exception, HttpServletRequest request) {
+<span class="fc" id="L73">		LOGGER.warn(&quot;Brace yourselves, Service alert!&quot;, exception);</span>
+<span class="fc" id="L74">		Meta meta = new EnvelopeResponse.Meta();</span>
+<span class="fc" id="L75">		meta.addError(exception.getClass().getSimpleName(), exception.getMessage());</span>
+<span class="fc" id="L76">		HttpStatus status = statusMap.get(exception.getClass());</span>
+<span class="fc" id="L77">		return ResponseEntity</span>
+<span class="fc" id="L78">			.status(status)</span>
+<span class="fc" id="L79">			.body(new EnvelopeResponse(meta));</span>
+	}
+	
+	/**
+	 * handles bean errors
+	 * @param ex {@link MethodArgumentNotValidException}
+	 * @param request {@link HttpServletRequest} the request
+	 * @return {@link EnvelopeResponse} an envelope with the error response
+	 */
+	@ExceptionHandler(MethodArgumentNotValidException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ResponseBody
+	public EnvelopeResponse exceptionHandler(MethodArgumentNotValidException ex, HttpServletRequest request) {
+<span class="nc" id="L92">		BindingResult bindingResult = ex.getBindingResult();</span>
+<span class="nc" id="L93">		List&lt;FieldError&gt; fieldErrors = bindingResult.getFieldErrors();</span>
+
+<span class="nc" id="L95">		return processFieldErrors(fieldErrors);</span>
+	}
+
+	private EnvelopeResponse processFieldErrors(List&lt;FieldError&gt; fieldErrors) {
+		
+<span class="nc" id="L100">		Meta meta = new EnvelopeResponse.Meta();</span>
+<span class="nc" id="L101">		fieldErrors.stream()</span>
+<span class="nc" id="L102">			.forEach(field -&gt; </span>
+				meta.addError(&quot;Invalid property &quot; + field.getField(), field.getDefaultMessage()));
+		
+<span class="nc" id="L105">		return new EnvelopeResponse(meta);</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.0.201403182114</span></div></body></html>

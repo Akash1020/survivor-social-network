@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>Survivor.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">org-zombie-apocalipse-api</a> &gt; <a href="index.source.html" class="el_package">org.zombie.apocalipse.api.survivor.model</a> &gt; <span class="el_source">Survivor.java</span></div><h1>Survivor.java</h1><pre class="source lang-java linenums">package org.zombie.apocalipse.api.survivor.model;
+
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.zombie.apocalipse.api.core.model.AbstractModel;
+import org.zombie.apocalipse.api.invetory.model.Inventory;
+
+/**
+ * Represents the survivor document in the collection in mongoDB.
+ * 
+ * @author Itair Miguel
+ *
+ */
+@Document(collection = &quot;survivors&quot;)
+<span class="fc" id="L15">public class Survivor extends AbstractModel {</span>
+
+	private String name;
+	private Integer age;
+	private String gender;
+	private Position position;
+<span class="fc" id="L21">	private Integer contaminationReports = 0;</span>
+	private Inventory[] inventory;
+
+	@Transient
+	private boolean incrementReports;
+
+	public String getName() {
+<span class="fc" id="L28">		return name;</span>
+	}
+
+	public void setName(String name) {
+<span class="fc" id="L32">		this.name = name;</span>
+<span class="fc" id="L33">	}</span>
+
+	public Integer getAge() {
+<span class="fc" id="L36">		return age;</span>
+	}
+
+	public void setAge(Integer age) {
+<span class="fc" id="L40">		this.age = age;</span>
+<span class="fc" id="L41">	}</span>
+
+	public String getGender() {
+<span class="fc" id="L44">		return gender;</span>
+	}
+
+	public void setGender(String gender) {
+<span class="fc" id="L48">		this.gender = gender;</span>
+<span class="fc" id="L49">	}</span>
+
+	public Integer getContaminationReports() {
+<span class="fc" id="L52">		return contaminationReports;</span>
+	}
+
+	public void setContaminationReports(Integer contaminationReports) {
+<span class="fc" id="L56">		this.contaminationReports = contaminationReports;</span>
+<span class="fc" id="L57">	}</span>
+
+	public Inventory[] getInventory() {
+<span class="fc" id="L60">		return inventory;</span>
+	}
+
+	public void setInventory(Inventory[] inventory) {
+<span class="nc" id="L64">		this.inventory = inventory.clone();</span>
+<span class="nc" id="L65">	}</span>
+
+	public boolean isIncrementReports() {
+<span class="fc" id="L68">		return incrementReports;</span>
+	}
+
+	public void setIncrementReports(boolean incrementReports) {
+<span class="fc" id="L72">		this.incrementReports = incrementReports;</span>
+<span class="fc" id="L73">	}</span>
+
+	public Position getPosition() {
+<span class="fc" id="L76">		return position;</span>
+	}
+
+	public void setPosition(Position position) {
+<span class="fc" id="L80">		this.position = position;</span>
+<span class="fc" id="L81">	}</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.0.201403182114</span></div></body></html>

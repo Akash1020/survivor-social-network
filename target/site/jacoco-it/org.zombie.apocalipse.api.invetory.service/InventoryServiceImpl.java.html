@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>InventoryServiceImpl.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">org-zombie-apocalipse-api</a> &gt; <a href="index.source.html" class="el_package">org.zombie.apocalipse.api.invetory.service</a> &gt; <span class="el_source">InventoryServiceImpl.java</span></div><h1>InventoryServiceImpl.java</h1><pre class="source lang-java linenums">package org.zombie.apocalipse.api.invetory.service;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.bson.types.ObjectId;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.zombie.apocalipse.api.core.exception.NotFoundException;
+import org.zombie.apocalipse.api.core.service.AbstractCrudService;
+import org.zombie.apocalipse.api.invetory.dto.InventoryDTO;
+import org.zombie.apocalipse.api.invetory.model.Inventory;
+import org.zombie.apocalipse.api.invetory.repository.InventoryRepository;
+
+/**
+ * Service layer to the survivor inventory
+ * 
+ * @author Itair Miguel
+ *
+ */
+@Service
+public class InventoryServiceImpl extends
+		AbstractCrudService&lt;Inventory, InventoryDTO, InventoryRepository, InventoryMapper&gt; implements InventoryService {
+
+	private InventoryRepository repo;
+	private InventoryMapper mapper;
+
+	@Autowired
+	public InventoryServiceImpl(InventoryRepository repo, InventoryMapper mapper) {
+<span class="fc" id="L31">		super(repo, mapper);</span>
+<span class="fc" id="L32">		this.repo = repo;</span>
+<span class="fc" id="L33">		this.mapper = mapper;</span>
+<span class="fc" id="L34">	}</span>
+
+	@Override
+	public InventoryDTO getSurvivorInventory(String survivorId) {
+		Inventory inventory;
+<span class="nc bnc" id="L39" title="All 2 branches missed.">		if ((inventory = repo.findBySurvivorId(survivorId)) == null) {</span>
+<span class="nc" id="L40">			throw new NotFoundException(&quot;No inventories were found.&quot;);</span>
+		}
+<span class="nc" id="L42">		return mapper.toDto(inventory);</span>
+	}
+	
+	@Override
+	public void update(InventoryDTO dto) {
+<span class="fc" id="L47">		repo.update(mapper.toEntity(dto));</span>
+<span class="fc" id="L48">	}</span>
+
+	@Override
+	public List&lt;Map&lt;String, Integer&gt;&gt; getInventoryItemsBySurvivorsIds(List&lt;String&gt; ids) {
+<span class="fc" id="L52">		List&lt;ObjectId&gt; objectIds = ids.stream().map(e -&gt; new ObjectId(e)).collect(Collectors.toList());</span>
+		
+<span class="fc" id="L54">		List&lt;Inventory&gt; inventories = repo.getInventoriesBySurvivorsIds(objectIds);</span>
+		
+<span class="fc" id="L56">		List&lt;Map&lt;String, Integer&gt;&gt; mappedList = null;</span>
+		
+<span class="pc bpc" id="L58" title="1 of 2 branches missed.">		if(inventories != null) {</span>
+<span class="fc" id="L59">			return inventories.stream().map(e -&gt; e.getItems()).collect(Collectors.toList());</span>
+		}
+		
+<span class="nc" id="L62">		return mappedList;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.0.201403182114</span></div></body></html>

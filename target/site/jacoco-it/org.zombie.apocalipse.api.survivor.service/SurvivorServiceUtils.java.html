@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>SurvivorServiceUtils.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">org-zombie-apocalipse-api</a> &gt; <a href="index.source.html" class="el_package">org.zombie.apocalipse.api.survivor.service</a> &gt; <span class="el_source">SurvivorServiceUtils.java</span></div><h1>SurvivorServiceUtils.java</h1><pre class="source lang-java linenums">package org.zombie.apocalipse.api.survivor.service;
+
+import java.util.Map;
+
+import org.bson.types.ObjectId;
+import org.zombie.apocalipse.api.core.exception.InvalidParamsException;
+import org.zombie.apocalipse.api.survivor.dto.SurvivorDTO;
+import org.zombie.apocalipse.api.survivor.dto.TradeDTO;
+
+<span class="nc" id="L10">public class SurvivorServiceUtils {</span>
+
+	/**
+	 * perform the trade between inventories
+	 * 
+	 * @param trade
+	 *            trade info and items to trade
+	 * @param seller
+	 *            one of the traders
+	 * @param buyer
+	 *            the other trader
+	 */
+	public static void doPerformTrade(TradeDTO trade, SurvivorDTO seller, SurvivorDTO buyer) {
+<span class="fc" id="L23">		performTrade(trade.getBuyerTrade().getMappedInventory(), seller.getInventory().getMappedInventory(),</span>
+<span class="fc" id="L24">				buyer.getInventory().getMappedInventory());</span>
+
+<span class="fc" id="L26">		performTrade(trade.getSellerTrade().getMappedInventory(), buyer.getInventory().getMappedInventory(),</span>
+<span class="fc" id="L27">				seller.getInventory().getMappedInventory());</span>
+<span class="fc" id="L28">	}</span>
+
+	/**
+	 * verifies if it is possible to perform the trade
+	 * 
+	 * @param trade
+	 *            items to trade
+	 * @param seller
+	 *            one of the traders
+	 * @param buyer
+	 *            the other trader
+	 * @throws InvalidParamsException
+	 *             trade value is different
+	 */
+	public static void verifyTrade(TradeDTO trade, SurvivorDTO seller, SurvivorDTO buyer) {
+<span class="fc" id="L43">		int sellerTradeValue = getTradeValue(trade.getSellerTrade().getMappedInventory(),</span>
+<span class="fc" id="L44">				seller.getInventory().getMappedInventory());</span>
+
+<span class="fc" id="L46">		int buyerTradeValue = getTradeValue(trade.getBuyerTrade().getMappedInventory(),</span>
+<span class="fc" id="L47">				buyer.getInventory().getMappedInventory());</span>
+
+<span class="fc bfc" id="L49" title="All 2 branches covered.">		if (sellerTradeValue != buyerTradeValue) {</span>
+<span class="fc" id="L50">			throw new InvalidParamsException(</span>
+					&quot;Item value for the trade are different. Currently: &quot; + sellerTradeValue + &quot; / &quot; + buyerTradeValue);
+		}
+<span class="fc" id="L53">	}</span>
+
+	/**
+	 * performs the trade removing the survivors items from his inventory and
+	 * adding this items to the other survivor intenvory
+	 * 
+	 * @param trader
+	 *            items of the trader performing the trade
+	 * @param receiver
+	 *            items of the receiver of the trade
+	 * @param traderInventory
+	 *            inventory of the trader
+	 */
+	public static void performTrade(Map&lt;String, Integer&gt; trader, Map&lt;String, Integer&gt; receiver,
+			Map&lt;String, Integer&gt; traderInventory) {
+<span class="fc bfc" id="L68" title="All 2 branches covered.">		for (Map.Entry&lt;String, Integer&gt; entry : trader.entrySet()) {</span>
+<span class="fc" id="L69">			receiver.put(entry.getKey(), receiver.get(entry.getKey()) + entry.getValue());</span>
+<span class="fc" id="L70">			traderInventory.put(entry.getKey(), traderInventory.get(entry.getKey()) - entry.getValue());</span>
+<span class="fc" id="L71">		}</span>
+<span class="fc" id="L72">	}</span>
+
+	/**
+	 * returns the total trade value for the given trader based on his inventory
+	 * 
+	 * @param trade
+	 *            items to trade
+	 * @param inventory
+	 *            items stored
+	 * @return the value of the trade
+	 * @throws InvalidParamsException
+	 *             when trader do not have enough items stored
+	 */
+	public static Integer getTradeValue(Map&lt;String, Integer&gt; trade, Map&lt;String, Integer&gt; inventory) {
+<span class="fc" id="L86">		int tradeValue = 0;</span>
+<span class="fc bfc" id="L87" title="All 2 branches covered.">		for (Map.Entry&lt;String, Integer&gt; entry : trade.entrySet()) {</span>
+			
+<span class="fc bfc" id="L89" title="All 2 branches covered.">			if(entry.getValue() &gt; 0) {</span>
+<span class="fc" id="L90">				Integer value = inventory.get(entry.getKey());</span>
+				
+<span class="pc bpc" id="L92" title="1 of 4 branches missed.">				if (value != null &amp;&amp; value &gt;= entry.getValue()) {</span>
+<span class="fc" id="L93">					tradeValue += (SurvivorInventory.getValue(entry.getKey()) * entry.getValue());</span>
+<span class="fc" id="L94">					continue;</span>
+				}
+				
+<span class="fc" id="L97">				throw new InvalidParamsException(</span>
+<span class="fc" id="L98">						&quot;Trade could not be completed. Trader do not have enough of the item: &quot; + entry.getKey());</span>
+			}
+<span class="fc" id="L100">		}</span>
+<span class="fc bfc" id="L101" title="All 2 branches covered.">		if(tradeValue == 0) {</span>
+<span class="fc" id="L102">			throw new InvalidParamsException(&quot;Don't be cheap, please inform something to trade.&quot;);</span>
+		}
+<span class="fc" id="L104">		return tradeValue;</span>
+	}
+
+	/**
+	 * validate if the ids passed as parameters are compatible with ObjectIds
+	 * 
+	 * @param id
+	 *            given ids to validate
+	 */
+	public static void validateIds(String... id) {
+<span class="fc bfc" id="L114" title="All 2 branches covered.">		for (int i = 0; i &lt; id.length; i++) {</span>
+<span class="fc bfc" id="L115" title="All 2 branches covered.">			if (!ObjectId.isValid(id[i])) {</span>
+<span class="fc" id="L116">				throw new InvalidParamsException(&quot;A valid id is required. Currently: &quot; + id[i]);</span>
+			}
+		}
+<span class="fc" id="L119">	}</span>
+	
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.0.201403182114</span></div></body></html>

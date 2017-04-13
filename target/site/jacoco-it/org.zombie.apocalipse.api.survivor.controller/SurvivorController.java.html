@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>SurvivorController.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">org-zombie-apocalipse-api</a> &gt; <a href="index.source.html" class="el_package">org.zombie.apocalipse.api.survivor.controller</a> &gt; <span class="el_source">SurvivorController.java</span></div><h1>SurvivorController.java</h1><pre class="source lang-java linenums">package org.zombie.apocalipse.api.survivor.controller;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.zombie.apocalipse.api.core.EnvelopeResponse;
+import org.zombie.apocalipse.api.core.MessageResponse;
+import org.zombie.apocalipse.api.survivor.dto.SurvivorDTO;
+import org.zombie.apocalipse.api.survivor.dto.TradeDTO;
+import org.zombie.apocalipse.api.survivor.service.SurvivorService;
+
+/**
+ * primary controller that services data of the survivors
+ * @author Itair Miguel
+ *
+ */
+@RestController
+@RequestMapping(&quot;${api.services-prefix}/survivors&quot;)
+<span class="fc" id="L32">public class SurvivorController {</span>
+	
+	@Autowired
+	private SurvivorService service;
+	
+	@RequestMapping(method=RequestMethod.GET)
+	public EnvelopeResponse listAll(HttpServletRequest request) {
+		
+<span class="fc" id="L40">		return new EnvelopeResponse(service.searchAll());</span>
+	}
+	
+	@RequestMapping(method=RequestMethod.GET, value=&quot;/{id}&quot;)
+	public EnvelopeResponse get(HttpServletRequest request, @PathVariable String id) throws Exception {
+
+<span class="fc" id="L46">		return new EnvelopeResponse(service.search(id));</span>
+	}
+	
+	@ResponseBody
+	@RequestMapping(method=RequestMethod.POST, consumes={MediaType.APPLICATION_JSON_VALUE})
+	public ResponseEntity&lt;EnvelopeResponse&gt; create(@Valid @RequestBody SurvivorDTO dto, 
+			HttpServletRequest request) throws Exception {
+		
+<span class="fc" id="L54">		dto.setId(null);</span>
+		
+<span class="fc" id="L56">		return this.getWrappedCreationResponse(service.create(dto));</span>
+	}
+	
+	@RequestMapping(method=RequestMethod.PATCH, value=&quot;/{id}&quot;, consumes={MediaType.APPLICATION_JSON_VALUE})
+	public MessageResponse update(@PathVariable String id, @RequestBody SurvivorDTO dto, 
+			HttpServletRequest request) throws Exception {
+		
+<span class="fc" id="L63">		dto.setId(id);</span>
+<span class="fc" id="L64">		service.update(dto);</span>
+		
+<span class="fc" id="L66">		return MessageResponse.build(&quot;Survivor updated.&quot;);</span>
+	}
+	
+	@RequestMapping(method=RequestMethod.POST, value=&quot;/{id}/report&quot;)
+	public MessageResponse reportInfected(@PathVariable String id, @RequestParam(required=true) String infectedName, 
+			HttpServletRequest request) throws Exception {
+		
+<span class="fc" id="L73">		service.updateInfectionCounter(id, infectedName);</span>
+		
+<span class="fc" id="L75">		return MessageResponse.build(&quot;Infected survivor succesfully reported.&quot;);</span>
+	}
+	
+	@RequestMapping(method=RequestMethod.POST, value=&quot;/{id}/trade&quot;, consumes={MediaType.APPLICATION_JSON_VALUE})
+	public MessageResponse trade(@PathVariable String id, @RequestBody @Valid TradeDTO dto, 
+			HttpServletRequest request) throws Exception {
+		
+<span class="fc" id="L82">		service.trade(id, dto);</span>
+		
+<span class="fc" id="L84">		return MessageResponse.build(&quot;Trade succesful.&quot;);</span>
+	}
+	
+	/**
+     * sets the response in case of a new created object
+     * @param createdDto - recently created object and its id
+     * @return ResponseEntity creation response
+     */
+	private ResponseEntity&lt;EnvelopeResponse&gt; getWrappedCreationResponse(SurvivorDTO createdDto) {
+<span class="fc" id="L93">		EnvelopeResponse envResponse = new EnvelopeResponse(createdDto);</span>
+<span class="fc" id="L94">		HttpHeaders headers = getHeaderWithLocation((String) createdDto.getId());</span>
+<span class="fc" id="L95">		return new ResponseEntity&lt;EnvelopeResponse&gt;(envResponse, headers, HttpStatus.CREATED);</span>
+	}
+	
+	/**
+     * sets the header of the HTTP
+     * @param id - ObjectId created by mongoDB
+     * @return HttpHeaders header of the response
+     */
+    private HttpHeaders getHeaderWithLocation(String id) {
+<span class="fc" id="L104">		HttpHeaders headers = new HttpHeaders();</span>
+<span class="fc" id="L105">		ServletUriComponentsBuilder.fromCurrentRequest().path(&quot;/{id}&quot;).buildAndExpand(id).toUri();</span>
+<span class="fc" id="L106">		return headers;</span>
+	}
+	
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.0.201403182114</span></div></body></html>

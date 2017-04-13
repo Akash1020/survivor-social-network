@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>AbstractCrudService.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">org-zombie-apocalipse-api</a> &gt; <a href="index.source.html" class="el_package">org.zombie.apocalipse.api.core.service</a> &gt; <span class="el_source">AbstractCrudService.java</span></div><h1>AbstractCrudService.java</h1><pre class="source lang-java linenums">package org.zombie.apocalipse.api.core.service;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.stereotype.Service;
+import org.zombie.apocalipse.api.core.dto.DocumentDTO;
+import org.zombie.apocalipse.api.core.exception.ServiceException;
+import org.zombie.apocalipse.api.core.mapper.GenericMapper;
+import org.zombie.apocalipse.api.core.model.Model;
+
+@Service
+public abstract class AbstractCrudService&lt;E extends Model, D extends DocumentDTO, R extends MongoRepository&lt;E, String&gt;, M extends GenericMapper&lt;E, D&gt;&gt;
+		implements CrudService&lt;E, D&gt; {
+
+	private R repo;
+	private M mapper;
+	
+	@Autowired
+<span class="fc" id="L22">	public AbstractCrudService(R repository, M mapper) {</span>
+<span class="fc" id="L23">		this.repo = repository;</span>
+<span class="fc" id="L24">		this.mapper = mapper;</span>
+<span class="fc" id="L25">	}</span>
+
+	public D create(D dto) {
+		E result;
+<span class="pc bpc" id="L29" title="1 of 2 branches missed.">		if((result = repo.save(mapper.toEntity(dto))) == null) {</span>
+<span class="nc" id="L30">			throw new ServiceException(&quot;Could not save.&quot;);</span>
+		}
+<span class="fc" id="L32">		return mapper.toDto(result);</span>
+	}
+
+	public D search(String id) {
+<span class="nc" id="L36">		E result = repo.findOne(id);</span>
+<span class="nc" id="L37">		return mapper.toDto(result);</span>
+	}
+
+	public List&lt;D&gt; searchAll() {
+<span class="nc" id="L41">		return repo.findAll().stream().map(e -&gt; mapper.toDto(e)).collect(Collectors.toList());</span>
+	}
+
+	public void update(D dto) {
+
+<span class="nc" id="L46">	}</span>
+
+	public void delete(D dto) {
+<span class="nc" id="L49">		repo.delete(dto.getId());</span>
+<span class="nc" id="L50">	}</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.0.201403182114</span></div></body></html>

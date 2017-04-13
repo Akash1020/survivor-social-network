@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>NotFoundException.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">org-zombie-apocalipse-api</a> &gt; <a href="index.source.html" class="el_package">org.zombie.apocalipse.api.core.exception</a> &gt; <span class="el_source">NotFoundException.java</span></div><h1>NotFoundException.java</h1><pre class="source lang-java linenums">package org.zombie.apocalipse.api.core.exception;
+
+/**
+ * if this guy is thrown there are no cookies for you this time.
+ * @author Itair Miguel
+ *
+ */
+public class NotFoundException extends ServiceException {
+
+	private static final long serialVersionUID = -8308104984419907039L;
+	
+	private static final String DEFAULT_MESSAGE = &quot;We tried, but there was nothing here...&quot;; 
+
+	/**
+	 * constructor to inform a customized message and the previous exception
+	 * @param message The exception message
+	 * @param cause The causing exception (previous)
+	 */
+	public NotFoundException(String message, Throwable cause) {
+<span class="fc" id="L20">		super(message, cause);</span>
+<span class="fc" id="L21">	}</span>
+
+	/**
+	 * constructor to inform a customized message
+	 * @param message The message of the exception
+	 */
+	public NotFoundException(String message) {
+<span class="fc" id="L28">		super(message);</span>
+<span class="fc" id="L29">	}</span>
+	
+	/**
+	 * constructor of the default message passing the cause
+	 * @param cause cause of the exception
+	 */
+	public NotFoundException(Throwable cause) {
+<span class="nc" id="L36">		super(DEFAULT_MESSAGE, cause);</span>
+<span class="nc" id="L37">	}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.0.201403182114</span></div></body></html>

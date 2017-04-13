@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>SurvivorReportsServiceImpl.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">org-zombie-apocalipse-api</a> &gt; <a href="index.source.html" class="el_package">org.zombie.apocalipse.api.report.service</a> &gt; <span class="el_source">SurvivorReportsServiceImpl.java</span></div><h1>SurvivorReportsServiceImpl.java</h1><pre class="source lang-java linenums">package org.zombie.apocalipse.api.report.service;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.zombie.apocalipse.api.infection.service.InfectionReportService;
+import org.zombie.apocalipse.api.invetory.service.InventoryService;
+import org.zombie.apocalipse.api.report.dto.InventoryReportsDTO;
+import org.zombie.apocalipse.api.report.dto.SurvivorReportsDTO;
+import org.zombie.apocalipse.api.survivor.service.SurvivorService;
+
+@Service
+public class SurvivorReportsServiceImpl implements SurvivorReportsService {
+
+	private SurvivorService survivor;
+	private InventoryService inventory;
+	@SuppressWarnings(&quot;unused&quot;)
+	private InfectionReportService infection;
+
+	@Autowired
+	public SurvivorReportsServiceImpl(SurvivorService survivor, InventoryService inventory,
+<span class="fc" id="L24">			InfectionReportService infection) {</span>
+<span class="fc" id="L25">		this.survivor = survivor;</span>
+<span class="fc" id="L26">		this.inventory = inventory;</span>
+<span class="fc" id="L27">		this.infection = infection;</span>
+<span class="fc" id="L28">	}</span>
+
+	@Override
+	public SurvivorReportsDTO percentageOfInfectedSurvivorReport() {
+<span class="fc" id="L32">		SurvivorReportsDTO dto = new SurvivorReportsDTO();</span>
+
+<span class="fc" id="L34">		Long numberOfSurvivors = survivor.getTotalSurvivors();</span>
+
+<span class="fc" id="L36">		Integer totalInfected = survivor.totalInfectedSurvivors();</span>
+<span class="fc" id="L37">		dto.setPercentage((100d / numberOfSurvivors) * totalInfected);</span>
+
+<span class="fc" id="L39">		return dto;</span>
+	}
+
+	@Override
+	public SurvivorReportsDTO percentageOfNonInfectedSurvivorReport() {
+<span class="fc" id="L44">		SurvivorReportsDTO dto = new SurvivorReportsDTO();</span>
+
+<span class="fc" id="L46">		Long numberOfSurvivors = survivor.getTotalSurvivors();</span>
+
+<span class="fc" id="L48">		Integer totalNonInfected = survivor.totalNonlInfectedSurvivors();</span>
+<span class="fc" id="L49">		dto.setPercentage((100d / numberOfSurvivors) * totalNonInfected);</span>
+
+<span class="fc" id="L51">		return dto;</span>
+	}
+
+	@Override
+	public InventoryReportsDTO inventoryPointsLostReport() {
+<span class="fc" id="L56">		return this.inventoryReportByPointsLost(survivor.getInfectedSurvivorsId());</span>
+	}
+
+	@Override
+	public InventoryReportsDTO inventoryAverageAmountOfItemsPerSurvivorReport() {
+<span class="fc" id="L61">		return this.averageAmountPerSurvivor(survivor.getNonInfectedSurvivorsId());</span>
+	}
+
+	private InventoryReportsDTO averageAmountPerSurvivor(List&lt;String&gt; infectedSurvivorsId) {
+<span class="fc" id="L65">		InventoryReportsDTO dto = new InventoryReportsDTO();</span>
+		List&lt;Map&lt;String, Integer&gt;&gt; inventoryItems;
+
+<span class="pc bpc" id="L68" title="1 of 2 branches missed.">		if (infectedSurvivorsId == null) {</span>
+<span class="nc" id="L69">			dto.setAmmunitionPerSurvivor(0.0);</span>
+<span class="nc" id="L70">			dto.setFoodPerSurvivor(0.0);</span>
+<span class="nc" id="L71">			dto.setWaterPerSurvivor(0.0);</span>
+<span class="nc" id="L72">			dto.setMedicationPerSurvivor(0.0);</span>
+<span class="nc" id="L73">			return dto;</span>
+		}
+
+<span class="fc" id="L76">		inventoryItems = inventory.getInventoryItemsBySurvivorsIds(infectedSurvivorsId);</span>
+
+<span class="fc" id="L78">		SurvivorReportsUtils.setAverage(dto, inventoryItems);</span>
+
+<span class="fc" id="L80">		return dto;</span>
+	}
+
+	private InventoryReportsDTO inventoryReportByPointsLost(List&lt;String&gt; infectedSurvivorsId) {
+<span class="fc" id="L84">		InventoryReportsDTO dto = new InventoryReportsDTO();</span>
+		List&lt;Map&lt;String, Integer&gt;&gt; inventoryItems;
+
+<span class="pc bpc" id="L87" title="1 of 2 branches missed.">		if (infectedSurvivorsId == null) {</span>
+<span class="nc" id="L88">			dto.setPointsLost(0);</span>
+<span class="nc" id="L89">			return dto;</span>
+		}
+
+<span class="fc" id="L92">		inventoryItems = inventory.getInventoryItemsBySurvivorsIds(infectedSurvivorsId);</span>
+
+<span class="pc bpc" id="L94" title="2 of 4 branches missed.">		if (inventoryItems != null &amp;&amp; inventoryItems.size() &gt; 0) {</span>
+<span class="fc" id="L95">			Integer pointsLost = 0;</span>
+<span class="fc bfc" id="L96" title="All 2 branches covered.">			for (Map&lt;String, Integer&gt; items : inventoryItems) {</span>
+<span class="fc" id="L97">				pointsLost = SurvivorReportsUtils.sumPointsLost(pointsLost, items);</span>
+<span class="fc" id="L98">			}</span>
+<span class="fc" id="L99">			dto.setPointsLost(pointsLost);</span>
+		}
+
+<span class="fc" id="L102">		return dto;</span>
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.0.201403182114</span></div></body></html>

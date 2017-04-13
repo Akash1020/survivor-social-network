@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>SurvivorReportsUtils.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">org-zombie-apocalipse-api</a> &gt; <a href="index.source.html" class="el_package">org.zombie.apocalipse.api.report.service</a> &gt; <span class="el_source">SurvivorReportsUtils.java</span></div><h1>SurvivorReportsUtils.java</h1><pre class="source lang-java linenums">package org.zombie.apocalipse.api.report.service;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.zombie.apocalipse.api.report.dto.InventoryReportsDTO;
+import org.zombie.apocalipse.api.survivor.service.SurvivorInventory;
+
+<span class="nc" id="L10">public class SurvivorReportsUtils {</span>
+	
+	public static InventoryReportsDTO setAverage(InventoryReportsDTO dto, List&lt;Map&lt;String, Integer&gt;&gt; itemsList) {
+<span class="fc" id="L13">		Map&lt;String, Integer&gt; totaItems = new HashMap&lt;&gt;();</span>
+
+<span class="fc" id="L15">		itemsList.forEach(e -&gt; sumItems(totaItems, e));</span>
+		
+<span class="fc" id="L17">		setAverageItemPerSurvivor(dto, totaItems, itemsList.size());</span>
+
+<span class="fc" id="L19">		return dto;</span>
+	}
+
+	public static InventoryReportsDTO setAverageItemPerSurvivor(InventoryReportsDTO dto, Map&lt;String, Integer&gt; items,
+			Integer numberOfSurvivors) {
+
+<span class="fc" id="L25">		Integer ammo = items.get(SurvivorInventory.AMMUNITION.name());</span>
+<span class="fc" id="L26">		Integer food = items.get(SurvivorInventory.FOOD.name());</span>
+<span class="fc" id="L27">		Integer water = items.get(SurvivorInventory.WATER.name());</span>
+<span class="fc" id="L28">		Integer meds = items.get(SurvivorInventory.MEDICATION.name());</span>
+		
+<span class="pc bpc" id="L30" title="2 of 4 branches missed.">		if(ammo != null &amp;&amp; ammo &gt; 0) {</span>
+<span class="fc" id="L31">			dto.setAmmunitionPerSurvivor(ammo / (numberOfSurvivors * 1.0));</span>
+		}
+<span class="pc bpc" id="L33" title="2 of 4 branches missed.">		if(food != null &amp;&amp; food &gt; 0) {</span>
+<span class="fc" id="L34">			dto.setFoodPerSurvivor(food / (numberOfSurvivors * 1.0));</span>
+		}
+<span class="pc bpc" id="L36" title="2 of 4 branches missed.">		if(water != null &amp;&amp; water &gt; 0) {</span>
+<span class="fc" id="L37">			dto.setWaterPerSurvivor(water / (numberOfSurvivors * 1.0));</span>
+		}
+<span class="pc bpc" id="L39" title="2 of 4 branches missed.">		if(meds != null &amp;&amp; meds &gt; 0) {</span>
+<span class="fc" id="L40">			dto.setMedicationPerSurvivor(meds / (numberOfSurvivors * 1.0));</span>
+		}
+		
+<span class="fc" id="L43">		return dto;</span>
+	}
+
+	public static void sumItems(Map&lt;String, Integer&gt; totalMap, Map&lt;String, Integer&gt; items) {
+<span class="fc bfc" id="L47" title="All 2 branches covered.">		for (Map.Entry&lt;String, Integer&gt; entry : items.entrySet()) {</span>
+<span class="fc" id="L48">			Integer value = totalMap.get(entry.getKey());</span>
+<span class="pc bpc" id="L49" title="1 of 4 branches missed.">			if (value != null &amp;&amp; value &gt; 0) {</span>
+<span class="fc" id="L50">				totalMap.put(entry.getKey(), value + entry.getValue());</span>
+<span class="fc" id="L51">				continue;</span>
+			}
+<span class="fc" id="L53">			totalMap.put(entry.getKey(), entry.getValue());</span>
+<span class="fc" id="L54">		}</span>
+<span class="fc" id="L55">	}</span>
+	
+	public static Integer sumPointsLost(Integer pointsLost, Map&lt;String, Integer&gt; items) {
+<span class="fc bfc" id="L58" title="All 2 branches covered.">		for (Map.Entry&lt;String, Integer&gt; entry : items.entrySet()) {</span>
+<span class="fc bfc" id="L59" title="All 2 branches covered.">			if (entry.getValue() &gt; 0) {</span>
+<span class="fc" id="L60">				pointsLost += (SurvivorInventory.getValue(entry.getKey()) * entry.getValue());</span>
+			}
+<span class="fc" id="L62">		}</span>
+<span class="fc" id="L63">		return pointsLost;</span>
+	}
+	
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.0.201403182114</span></div></body></html>

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>SurvivorDTO.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">org-zombie-apocalipse-api</a> &gt; <a href="index.source.html" class="el_package">org.zombie.apocalipse.api.survivor.dto</a> &gt; <span class="el_source">SurvivorDTO.java</span></div><h1>SurvivorDTO.java</h1><pre class="source lang-java linenums">package org.zombie.apocalipse.api.survivor.dto;
+
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.validator.constraints.NotEmpty;
+import org.zombie.apocalipse.api.core.dto.AbstractDocumentDTO;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
+/**
+ * Data Transfer Object to transit through the layers
+ * 
+ * @author Itair Miguel
+ *
+ */
+@JsonInclude(Include.NON_NULL)
+<span class="fc" id="L19">public class SurvivorDTO extends AbstractDocumentDTO {</span>
+
+	@NotNull
+	private String name;
+	@NotNull
+	private Integer age;
+	@NotNull
+	private String gender;
+
+	private Integer contaminationReports;
+
+	@NotEmpty
+	private Double[] lastLocation;
+
+	@NotNull
+	private SurvivorInventoryDTO inventory;
+
+	@JsonIgnore
+	private boolean incrementReports;
+
+	public String getName() {
+<span class="fc" id="L40">		return name;</span>
+	}
+
+	public void setName(String name) {
+<span class="fc" id="L44">		this.name = name;</span>
+<span class="fc" id="L45">	}</span>
+
+	public Integer getAge() {
+<span class="fc" id="L48">		return age;</span>
+	}
+
+	public void setAge(Integer age) {
+<span class="fc" id="L52">		this.age = age;</span>
+<span class="fc" id="L53">	}</span>
+
+	public String getGender() {
+<span class="fc" id="L56">		return gender;</span>
+	}
+
+	public void setGender(String gender) {
+<span class="fc" id="L60">		this.gender = gender;</span>
+<span class="fc" id="L61">	}</span>
+
+	public Integer getContaminationReports() {
+<span class="fc" id="L64">		return contaminationReports;</span>
+	}
+
+	public void setContaminationReports(Integer conaminationReports) {
+<span class="fc" id="L68">		this.contaminationReports = conaminationReports;</span>
+<span class="fc" id="L69">	}</span>
+
+	public Double[] getLastLocation() {
+<span class="fc" id="L72">		return lastLocation;</span>
+	}
+
+	public void setLastLocation(Double... lastLocation) {
+<span class="fc" id="L76">		this.lastLocation = lastLocation.clone();</span>
+<span class="fc" id="L77">	}</span>
+
+	public SurvivorInventoryDTO getInventory() {
+<span class="fc" id="L80">		return inventory;</span>
+	}
+
+	public void setInventory(SurvivorInventoryDTO inventory) {
+<span class="fc" id="L84">		this.inventory = inventory;</span>
+<span class="fc" id="L85">	}</span>
+
+	public boolean isIncrementReports() {
+<span class="fc" id="L88">		return incrementReports;</span>
+	}
+
+	public void setIncrementReports(boolean incrementReports) {
+<span class="fc" id="L92">		this.incrementReports = incrementReports;</span>
+<span class="fc" id="L93">	}</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.0.201403182114</span></div></body></html>

@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>SurvivorServiceImpl.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">org-zombie-apocalipse-api</a> &gt; <a href="index.source.html" class="el_package">org.zombie.apocalipse.api.survivor.service</a> &gt; <span class="el_source">SurvivorServiceImpl.java</span></div><h1>SurvivorServiceImpl.java</h1><pre class="source lang-java linenums">package org.zombie.apocalipse.api.survivor.service;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+import org.bson.types.ObjectId;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.zombie.apocalipse.api.core.exception.InvalidParamsException;
+import org.zombie.apocalipse.api.core.exception.NotFoundException;
+import org.zombie.apocalipse.api.core.exception.ServiceException;
+import org.zombie.apocalipse.api.core.service.AbstractCrudService;
+import org.zombie.apocalipse.api.infection.service.InfectionReportService;
+import org.zombie.apocalipse.api.invetory.service.InventoryService;
+import org.zombie.apocalipse.api.survivor.dto.SurvivorDTO;
+import org.zombie.apocalipse.api.survivor.dto.TradeDTO;
+import org.zombie.apocalipse.api.survivor.model.Survivor;
+import org.zombie.apocalipse.api.survivor.repository.SurvivorRepository;
+
+/**
+ * implementation of {@link SurvivorService}. Heavy lifting is done here!
+ * 
+ * @author Itair Miguel
+ *
+ */
+@Service
+public class SurvivorServiceImpl extends AbstractCrudService&lt;Survivor, SurvivorDTO, SurvivorRepository, SurvivorMapper&gt;
+		implements SurvivorService {
+
+<span class="fc" id="L32">	private static final Logger LOGGER = LogManager.getLogger(SurvivorServiceImpl.class);</span>
+
+	private SurvivorRepository repo;
+	private InventoryService inventory;
+	private InfectionReportService report;
+	private SurvivorMapper mapper;
+
+	@Autowired
+	public SurvivorServiceImpl(SurvivorRepository repo, InventoryService inventory, InfectionReportService report,
+			SurvivorMapper mapper) {
+<span class="fc" id="L42">		super(repo, mapper);</span>
+<span class="fc" id="L43">		this.repo = repo;</span>
+<span class="fc" id="L44">		this.inventory = inventory;</span>
+<span class="fc" id="L45">		this.report = report;</span>
+<span class="fc" id="L46">		this.mapper = mapper;</span>
+<span class="fc" id="L47">	}</span>
+
+	@Override
+	public List&lt;SurvivorDTO&gt; searchAll() {
+<span class="fc" id="L51">		return mapper.toDtoList(repo.getAllSurvivors());</span>
+	}
+
+	@Override
+	public SurvivorDTO search(String id) {
+<span class="fc" id="L56">		return mapper.toDto(repo.getSurvivor(id));</span>
+	}
+
+	@Override
+	public SurvivorDTO create(SurvivorDTO dto) {
+		Survivor survivor;
+
+<span class="fc bfc" id="L63" title="All 2 branches covered.">		if (dto.getLastLocation().length &lt; 2) {</span>
+<span class="fc" id="L64">			throw new InvalidParamsException(</span>
+					&quot;Having a correct location is always necessary. Please send latitude and longitude.&quot;);
+		}
+
+<span class="pc bpc" id="L68" title="1 of 2 branches missed.">		if ((survivor = repo.save(mapper.toEntity(dto))) == null) {</span>
+<span class="nc" id="L69">			throw new ServiceException(&quot;Could not create a new survivor record.&quot;);</span>
+		}
+
+<span class="fc" id="L72">		dto.setId(survivor.getId());</span>
+
+		try {
+<span class="fc" id="L75">			inventory.create(mapper.toInventoryDto(dto));</span>
+<span class="nc" id="L76">		} catch (ServiceException e) {</span>
+<span class="nc" id="L77">			LOGGER.error(e.getMessage(), e);</span>
+<span class="nc" id="L78">			repo.delete(survivor.getId().toString());</span>
+<span class="nc" id="L79">			throw new ServiceException(e.getMessage(), e);</span>
+<span class="fc" id="L80">		}</span>
+
+<span class="fc" id="L82">		return dto;</span>
+	}
+
+	@Override
+	public void update(SurvivorDTO dto) {
+<span class="fc" id="L87">		repo.update(mapper.toEntity(dto));</span>
+<span class="fc" id="L88">	}</span>
+
+	@Override
+	public void updateInfectionCounter(String reporterId, String infectedName) {
+<span class="fc" id="L92">		SurvivorDTO infected = new SurvivorDTO();</span>
+<span class="fc" id="L93">		infected.setIncrementReports(true);</span>
+
+<span class="fc" id="L95">		SurvivorServiceUtils.validateIds(reporterId);</span>
+
+		Survivor infectedSuspect;
+<span class="pc bpc" id="L98" title="1 of 4 branches missed.">		if((infectedSuspect = repo.findOneByName(infectedName)) == null || infectedSuspect.getId() == null) {</span>
+<span class="fc" id="L99">			throw new InvalidParamsException(&quot;The given survivor name could not be found: &quot; + infectedName);</span>
+		}
+<span class="fc" id="L101">		infected.setId(infectedSuspect.getId());</span>
+
+<span class="fc bfc" id="L103" title="All 2 branches covered.">		if (infected.getId().equals(reporterId)) {</span>
+<span class="fc" id="L104">			throw new InvalidParamsException(&quot;Can't report and be reported as infected.&quot;);</span>
+		}
+
+<span class="fc bfc" id="L107" title="All 2 branches covered.">		if (report.haveAlreadyReportedThisSurvivor(new ObjectId(reporterId), new ObjectId(infected.getId()))) {</span>
+<span class="fc" id="L108">			throw new InvalidParamsException(&quot;You have already reported this survivor.&quot;);</span>
+		}
+
+		try {
+
+<span class="fc" id="L113">			SurvivorDTO reporter = this.search(reporterId);</span>
+<span class="fc" id="L114">			repo.update(mapper.toEntity(infected));</span>
+<span class="fc" id="L115">			report.create(mapper.toInfectionReportDTO(new ObjectId(infected.getId()), new ObjectId(reporter.getId())));</span>
+
+<span class="fc" id="L117">		} catch (NotFoundException e) {</span>
+<span class="fc" id="L118">			throw new InvalidParamsException(&quot;The given IDs could not be found: &quot; + reporterId, e);</span>
+<span class="nc" id="L119">		} catch (ServiceException e) {</span>
+<span class="nc" id="L120">			throw new ServiceException(e);</span>
+<span class="fc" id="L121">		}</span>
+
+<span class="fc" id="L123">	}</span>
+
+	@Override
+	public void trade(String sellerId, TradeDTO trade) {
+<span class="fc" id="L127">		SurvivorServiceUtils.validateIds(sellerId, trade.getBuyerId());</span>
+		
+<span class="fc bfc" id="L129" title="All 2 branches covered.">		if(sellerId.equals(trade.getBuyerId())) {</span>
+<span class="fc" id="L130">			throw new InvalidParamsException(&quot;Cannot perform trade between the same survivor.&quot;);</span>
+		}
+
+		try {
+<span class="fc" id="L134">			SurvivorDTO seller = this.search(sellerId);</span>
+<span class="fc" id="L135">			SurvivorDTO buyer = this.search(trade.getBuyerId());</span>
+
+<span class="pc bpc" id="L137" title="1 of 4 branches missed.">			if (seller.getContaminationReports() &gt;= 3 || buyer.getContaminationReports() &gt;= 3) {</span>
+<span class="fc" id="L138">				throw new InvalidParamsException(&quot;Careful now! do not trade with a zombie.&quot;);</span>
+			}
+
+<span class="fc" id="L141">			SurvivorServiceUtils.verifyTrade(trade, seller, buyer);</span>
+
+<span class="fc" id="L143">			SurvivorServiceUtils.doPerformTrade(trade, seller, buyer);</span>
+
+<span class="fc" id="L145">			inventory.update(mapper.toInventoryDto(seller));</span>
+<span class="fc" id="L146">			inventory.update(mapper.toInventoryDto(buyer));</span>
+
+<span class="fc" id="L148">		} catch (NotFoundException e) {</span>
+<span class="fc" id="L149">			throw new NotFoundException(</span>
+<span class="fc" id="L150">					&quot;One of the given IDs could not be found. Currently: &quot; + sellerId + &quot; / &quot; + trade.getBuyerId(), e);</span>
+<span class="fc" id="L151">		}</span>
+
+<span class="fc" id="L153">	}</span>
+
+	@Override
+	public Integer totalInfectedSurvivors() {
+<span class="fc" id="L157">		List&lt;Survivor&gt; survivors = repo.getInfectedSurvivors();</span>
+<span class="pc bpc" id="L158" title="2 of 4 branches missed.">		if(survivors != null &amp;&amp; survivors.size() &gt; 0) {</span>
+<span class="fc" id="L159">			return survivors.size();</span>
+		}
+<span class="nc" id="L161">		return 0;</span>
+	}
+
+	@Override
+	public Integer totalNonlInfectedSurvivors() {
+<span class="fc" id="L166">		List&lt;Survivor&gt; survivors = repo.getNonInfectedSurvivors();</span>
+<span class="pc bpc" id="L167" title="2 of 4 branches missed.">		if(survivors != null &amp;&amp; survivors.size() &gt; 0) {</span>
+<span class="fc" id="L168">			return survivors.size();</span>
+		}
+<span class="nc" id="L170">		return 0;</span>
+	}
+
+	@Override
+	public List&lt;String&gt; getInfectedSurvivorsId() {
+<span class="fc" id="L175">		List&lt;Survivor&gt; survivors = repo.getInfectedSurvivors();</span>
+<span class="pc bpc" id="L176" title="2 of 4 branches missed.">		if(survivors != null &amp;&amp; survivors.size() &gt; 0) {</span>
+<span class="fc" id="L177">			return survivors.stream().map(e -&gt; e.getId()).collect(Collectors.toList());</span>
+		}
+<span class="nc" id="L179">		return null;</span>
+	}
+
+	@Override
+	public List&lt;String&gt; getNonInfectedSurvivorsId() {
+<span class="fc" id="L184">		List&lt;Survivor&gt; survivors = repo.getNonInfectedSurvivors();</span>
+<span class="pc bpc" id="L185" title="2 of 4 branches missed.">		if(survivors != null &amp;&amp; survivors.size() &gt; 0) {</span>
+<span class="fc" id="L186">			return survivors.stream().map(e -&gt; e.getId()).collect(Collectors.toList());</span>
+		}
+<span class="nc" id="L188">		return null;</span>
+	}
+
+	@Override
+	public Long getTotalSurvivors() {
+<span class="fc" id="L193">		return repo.count();</span>
+	}
+	
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.0.201403182114</span></div></body></html>
